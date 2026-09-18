@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asas-Asas Pendidikan Islam & Modul Interactive PBL</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts for Arabic and Clean Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f8f6',
+                            100: '#e3eee9',
+                            500: '#1e6b52', // Emerald Islamic Green
+                            600: '#175440',
+                            700: '#124132',
+                            gold: '#c59b27', // Muted Gold Accent
+                            goldlight: '#f9f3e5',
+                            neutral: '#fbf9f5', // Warm Beige Background
+                            dark: '#1f2937'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        arabic: ['Amiri', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Embedded minimal CSS for Chart Container compliance */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .arabic-text {
+            font-family: 'Amiri', serif;
+            line-height: 2.2;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c59b27;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<!-- Chosen Palette: Warm Islamic Harmony (Warm Beige #fbf9f5, Emerald Green #1e6b52, Muted Gold #c59b27, Dark Slate #1f2937) -->
+<!-- Application Structure Plan: Designed as a 5-module interactive study hub & PBL workstation. Section 1: Interactive Overview & Radar Chart comparing educational foundations. Section 2: Explorer for 9 Asas Al-Abrasyi & 6 Asas Langgulung with filterable dalil/examples. Section 3: Interactive Ghazali's 8 Duties Explorer with practical scenarios. Section 4: Economic & Methodological Matrix. Section 5: Interactive 5-Stage PBL Workstation allowing live student inputs, action plan table building, dynamic PDF/text export, and scoring rubric calculator. -->
+<!-- Visualization & Content Choices: 1. Chart.js Radar Chart -> Represents 6 General Foundations weight -> Interactive toggles -> Visual clarity of balance in educational philosophy. 2. Tabbed Slide Player -> 9 Asas & Ghazali Duties -> Dynamic panel switching -> Easy consumption of Arabic dalil & context. 3. Interactive PBL Workbench -> Interactive form steps with live Action Plan builder -> Dynamic DOM updates -> Engaging hands-on problem solving. CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+<body class="bg-brand-neutral text-brand-dark font-sans antialiased min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP HEADER / NAVIGATION -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-500 text-brand-gold flex items-center justify-center font-bold text-xl shadow">
+                        ☪
+                    </div>
+                    <div>
+                        <h1 class="text-lg md:text-xl font-bold text-brand-700 leading-tight">Asas-Asas Pendidikan Islam</h1>
+                        <p class="text-xs text-gray-500 font-medium">Bahan Tayang Interaktif & Workstation LKM-PBL</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition bg-brand-500 text-white">Ikhtisar</button>
+                    <button onclick="switchTab('asas-9')" id="nav-asas-9" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-brand-50">9 Asas Al-Abrasyi</button>
+                    <button onclick="switchTab('asas-umum')" id="nav-asas-umum" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-brand-50">6 Asas Umum</button>
+                    <button onclick="switchTab('ghazali')" id="nav-ghazali" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-brand-50">Kewajiban Ghazali</button>
+                    <button onclick="switchTab('ekonomi')" id="nav-ekonomi" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-brand-50">Metode & Ekonomi</button>
+                    <button onclick="switchTab('lkm-pbl')" id="nav-lkm-pbl" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold text-brand-500 bg-brand-goldlight border border-brand-gold/30 hover:bg-brand-gold/20">📋 Lembar LKM-PBL</button>
+                </nav>
+
+                <!-- Mobile Navigation Toggle -->
+                <div class="md:hidden">
+                    <select onchange="switchTab(this.value)" class="bg-gray-50 border border-gray-300 text-gray-800 text-xs rounded-lg p-2 font-medium">
+                        <option value="overview">Ikhtisar Utama</option>
+                        <option value="asas-9">9 Asas Al-Abrasyi</option>
+                        <option value="asas-umum">6 Asas Umum Langgulung</option>
+                        <option value="ghazali">8 Kewajiban Imam Al-Ghazali</option>
+                        <option value="ekonomi">Metode & Ekonomi Guru</option>
+                        <option value="lkm-pbl">📋 LKM PBL Interaktif</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ================= SECTION 1: IKHTISAR (OVERVIEW) ================= -->
+        <section id="section-overview" class="tab-content space-y-8">
+            <div class="bg-gradient-to-r from-brand-700 to-brand-500 rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <span class="inline-block bg-brand-gold/30 text-brand-goldlight px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3">Pondasi Peradaban Muslim</span>
+                    <h2 class="text-2xl md:text-4xl font-extrabold mb-4 leading-snug">Hakikat & Framework Asas Pendidikan Islam</h2>
+                    <p class="text-brand-100 text-sm md:text-base leading-relaxed mb-6">
+                        Pendidikan Islam bagaikan bangunan rumah yang kokoh: memiliki fondasi, tiang, dan atap. Asas berfungsi sebagai landasan tempat berdirinya seluruh tatanan kognitif, afektif, dan psikomotorik peserta didik untuk membentuk <strong>Insan Kamil</strong> (manusia sempurna).
+                    </p>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="switchTab('lkm-pbl')" class="bg-brand-gold hover:bg-yellow-600 text-brand-700 font-bold px-5 py-2.5 rounded-xl text-sm transition shadow-lg">Mulai Kerjakan LKM PBL ➔</button>
+                        <button onclick="switchTab('asas-9')" class="bg-white/10 hover:bg-white/20 text-white font-semibold px-5 py-2.5 rounded-xl text-sm backdrop-blur transition">Jelajahi 9 Asas Pendidikan</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-emerald-100 text-brand-500 rounded-xl flex items-center justify-center font-bold text-xl mb-4">🧠</div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-2">Dimensi Kognitif</h3>
+                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">Pengembangan daya pikir, pengetahuan rasional, dan wawasan metodologis yang bersumber dari ketauhidan dan sains modern.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center font-bold text-xl mb-4">❤️</div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-2">Dimensi Afektif</h3>
+                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">Penataan emosi, penyucian jiwa (tazkiyatun nufs), pembentukan kesadaran moral, dan ikhlas karena Allah SWT.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center font-bold text-xl mb-4">⚡</div>
+                    <h3 class="font-bold text-lg text-gray-900 mb-2">Dimensi Psikomotorik</h3>
+                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">Penerapan konkrit keterampilan ibadah, akhlakul karimah, karya nyata, serta aksi sosial di kehidupan sehari-hari.</p>
+                </div>
+            </div>
+
+            <!-- Chart & Visual Analysis Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm">
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="inline-block bg-brand-50 text-brand-600 font-bold text-xs px-3 py-1 rounded-md">Analisis Integratif</div>
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-900">Keseimbangan 6 Asas Umum (Hasan Langgulung)</h3>
+                    <p class="text-gray-600 text-xs md:text-sm leading-relaxed">
+                        Sistem pendidikan Islam tidak dapat berdiri pada satu aspek saja. Asas <strong>Filsafat</strong> bertindak sebagai kompas spiritual dan logika pengarah utama bagi 5 asas pendukung lainnya.
+                    </p>
+                    <div class="space-y-2 text-xs md:text-sm text-gray-700">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-brand-500"></span> <strong>Filsafat:</strong> Pengarah Moral & Ideologi Utama</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-amber-500"></span> <strong>Psikologis:</strong> Pemahaman Perkembangan Jiwa</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span> <strong>Sosiologis & Ekonomi:</strong> Relevansi Sosial & Investasi Modal</div>
+                    </div>
+                </div>
+                <div class="lg:col-span-7 flex justify-center">
+                    <div class="chart-container">
+                        <canvas id="asasRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: 9 ASAS AL-ABRASYI ================= -->
+        <section id="section-asas-9" class="tab-content hidden space-y-6">
+            <div class="border-l-4 border-brand-500 pl-4 py-1">
+                <h2 class="text-2xl font-bold text-gray-900">9 Asas Pendidikan Islam (Perspektif M. Athiyah Al-Abrasyi)</h2>
+                <p class="text-sm text-gray-600">Hasil eksplorasi pemikiran Ibnu Khaldun, Imam Al-Ghazali, dan Az-Zarnuji.</p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="flex flex-wrap gap-2 pb-2 border-b border-gray-200">
+                <button onclick="filterAsas('all')" class="filter-asas-btn bg-brand-500 text-white px-4 py-1.5 rounded-full text-xs font-semibold shadow-sm">Semua Asas</button>
+                <button onclick="filterAsas('belajar')" class="filter-asas-btn bg-white text-gray-600 border border-gray-200 px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-gray-50">Pembelajaran & Metode</button>
+                <button onclick="filterAsas('fitrah')" class="filter-asas-btn bg-white text-gray-600 border border-gray-200 px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-gray-50">Fitrah & Bakat</button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="asas-cards-container">
+                <!-- Cards dynamically populated / hardcoded structure below -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: 6 ASAS UMUM LANGGULUNG ================= -->
+        <section id="section-asas-umum" class="tab-content hidden space-y-6">
+            <div class="border-l-4 border-amber-500 pl-4 py-1">
+                <h2 class="text-2xl font-bold text-gray-900">6 Asas Pendidikan Umum (Hasan Langgulung)</h2>
+                <p class="text-sm text-gray-600">Kerangka komprehensif penataan sistem dan organisasi pendidikan.</p>
+            </div>
+
+            <!-- Visual Architecture Hierarchy Diagram (HTML/CSS Based) -->
+            <div class="bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-8">
+                <div class="text-center max-w-xl mx-auto space-y-2">
+                    <div class="inline-block bg-brand-goldlight text-brand-gold font-bold text-xs px-3 py-1 rounded-full border border-brand-gold/30">Pengarah & Penyelaras Utama</div>
+                    <div class="p-4 bg-brand-700 text-white rounded-xl shadow-md font-bold text-lg md:text-xl border-2 border-brand-gold">
+                        🏛️ ASAS FILSAFAT
+                        <p class="text-xs font-normal text-brand-100 mt-1">Kompas moral, arah sistem, kontrol nilai, dan pengatur keharmonisan asas lainnya.</p>
+                    </div>
+                </div>
+
+                <div class="text-center text-gray-400 font-bold text-xl">↓ Menyelaraskan 5 Asas Lapangan ↓</div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <!-- Asas Historis -->
+                    <div onclick="showUmumDetail('historis')" class="cursor-pointer bg-slate-50 hover:bg-brand-50 p-4 rounded-xl border border-gray-200 hover:border-brand-500 transition group text-center space-y-2">
+                        <div class="text-2xl">📜</div>
+                        <h4 class="font-bold text-sm text-gray-900 group-hover:text-brand-500">Asas Historis</h4>
+                        <p class="text-xs text-gray-500 line-clamp-3">Refleksi pengalaman masa lalu, kelebihan, kekhasan, dan aturan hukum terdahulu.</p>
+                    </div>
+                    <!-- Asas Sosiologi -->
+                    <div onclick="showUmumDetail('sosiologi')" class="cursor-pointer bg-slate-50 hover:bg-brand-50 p-4 rounded-xl border border-gray-200 hover:border-brand-500 transition group text-center space-y-2">
+                        <div class="text-2xl">👥</div>
+                        <h4 class="font-bold text-sm text-gray-900 group-hover:text-brand-500">Asas Sosiologis</h4>
+                        <p class="text-xs text-gray-500 line-clamp-3">Pendidikan mentransfer, menyaring, dan mengembangkan budaya masyarakat.</p>
+                    </div>
+                    <!-- Asas Ekonomi -->
+                    <div onclick="showUmumDetail('ekonomi')" class="cursor-pointer bg-slate-50 hover:bg-brand-50 p-4 rounded-xl border border-gray-200 hover:border-brand-500 transition group text-center space-y-2">
+                        <div class="text-2xl">💼</div>
+                        <h4 class="font-bold text-sm text-gray-900 group-hover:text-brand-500">Asas Ekonomi</h4>
+                        <p class="text-xs text-gray-500 line-clamp-3">Perspektif potensi finansial, anggaran, dan investasi modal manusia (human capital).</p>
+                    </div>
+                    <!-- Asas Politik -->
+                    <div onclick="showUmumDetail('politik')" class="cursor-pointer bg-slate-50 hover:bg-brand-50 p-4 rounded-xl border border-gray-200 hover:border-brand-500 transition group text-center space-y-2">
+                        <div class="text-2xl">🏛️</div>
+                        <h4 class="font-bold text-sm text-gray-900 group-hover:text-brand-500">Asas Politik & Admin</h4>
+                        <p class="text-xs text-gray-500 line-clamp-3">Bingkai ideologi (aqidah), kepemimpinan, dan perencanaan pencapaian cita-cita.</p>
+                    </div>
+                    <!-- Asas Psikologis -->
+                    <div onclick="showUmumDetail('psikologis')" class="cursor-pointer bg-slate-50 hover:bg-brand-50 p-4 rounded-xl border border-gray-200 hover:border-brand-500 transition group text-center space-y-2">
+                        <div class="text-2xl">🧩</div>
+                        <h4 class="font-bold text-sm text-gray-900 group-hover:text-brand-500">Asas Psikologis</h4>
+                        <p class="text-xs text-gray-500 line-clamp-3">Watak kejiwaan peserta didik & guru, metode bimbingan, serta pengukuran evaluasi.</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Detail Modal Box -->
+                <div id="umum-detail-box" class="bg-brand-50 p-6 rounded-xl border border-brand-200">
+                    <h3 id="umum-title" class="font-bold text-brand-700 text-lg mb-2">Klik salah satu asas di atas untuk melihat detail & cakupan ilmunya</h3>
+                    <p id="umum-desc" class="text-gray-700 text-sm leading-relaxed">Setiap asas bukan sekadar satu mata pelajaran, melainkan gugusan cabang ilmu pengetahuan yang membentuk keutuhan sistem pendidikan Islam.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: KEWAJIBAN GHAZALI ================= -->
+        <section id="section-ghazali" class="tab-content hidden space-y-6">
+            <div class="border-l-4 border-brand-gold pl-4 py-1">
+                <h2 class="text-2xl font-bold text-gray-900">8 Kewajiban Pendidik Menurut Imam Al-Ghazali</h2>
+                <p class="text-sm text-gray-600">Kode etik dan prinsip penyusunan rencana pengajaran berkarakter Ilahi.</p>
+            </div>
+
+            <!-- Interactive Ghazali Accordion / Card Explorer -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left: Interactive List -->
+                <div class="lg:col-span-5 space-y-2">
+                    <div id="ghazali-list" class="space-y-2">
+                        <!-- Dynamic Buttons -->
+                    </div>
+                </div>
+                <!-- Right: Active View Display -->
+                <div class="lg:col-span-7 bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-md flex flex-col justify-between" id="ghazali-display">
+                    <!-- Content will be injected dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: METODE & EKONOMI ================= -->
+        <section id="section-ekonomi" class="tab-content hidden space-y-6">
+            <div class="border-l-4 border-blue-600 pl-4 py-1">
+                <h2 class="text-2xl font-bold text-gray-900">Metode Pengajaran & Realitas Ekonomi Guru</h2>
+                <p class="text-sm text-gray-600">Sintesis antara metodologi bertahap dan kesejahteraan profesional pendidik.</p>
+            </div>
+
+            <!-- Tabbed Comparison: Metode vs Ekonomi -->
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border-b border-gray-100 pb-6">
+                    <div class="p-4 rounded-xl bg-slate-50 space-y-2 border-t-4 border-emerald-500">
+                        <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">📖 Asas Metode Belajar</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4">
+                            <li>Memusatkan perhatian secara penuh.</li>
+                            <li>Mempelajari ilmu dari yang sederhana ke kompleks (<em>Simple to Complex</em>).</li>
+                            <li>Memperhatikan sistematika pembahasan & kesintesisan.</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 space-y-2 border-t-4 border-blue-500">
+                        <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">👨‍🏫 Asas Metode Mengajar</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4">
+                            <li>Memperhatikan daya pikir anak (<em>Kalam ala qadri 'uqulihim</em>).</li>
+                            <li>Menerangkan dengan kejelasan maksimal (<em>Clarity</em>).</li>
+                            <li>Dari konkret ke abstrak (Contoh: Belajar fisik shalat ke khusyu').</li>
+                            <li>Berangsur-angsur / step-by-step.</li>
+                        </ul>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 space-y-2 border-t-4 border-amber-500">
+                        <h3 class="font-bold text-gray-900 text-base flex items-center gap-2">🛡️ Asas Metode Mendidik</h3>
+                        <ul class="text-xs text-gray-600 space-y-2 list-disc pl-4">
+                            <li>Pemberian latihan & pembiasaan (<em>Habituation/Practice</em>).</li>
+                            <li>Pemberian nasihat tulus (<em>Mawa'iz</em>).</li>
+                            <li>Proteksi lingkungan dari pergaulan yang merusak.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Economic Reality Deep-Dive -->
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-6 rounded-xl border border-amber-200 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">💰</span>
+                        <div>
+                            <h3 class="font-bold text-lg text-amber-900">Dilema Klasik vs Realitas Modern Ekonomi Pendidikan</h3>
+                            <p class="text-xs text-amber-700">Refleksi Sejarah: Socrates, Pembebasan Tawanan Badar, dan Human Capital Theory</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs md:text-sm leading-relaxed text-gray-700">
+                        <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm space-y-2">
+                            <h4 class="font-bold text-brand-700">Perspektif Historis & Mengharap Ridha</h4>
+                            <p>Pada masa Socrates dan awal Islam, pengajaran Al-Qur'an sering kali bersifat sukarela atau bagian dari pembebasan tawanan perang. Namun, seiring berkembangnya peradaban, keterbatasan waktu guru untuk mengajar karena harus mencari nafkah berisiko menimbulkan kelangkaan pendidik berkualitas.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-amber-100 shadow-sm space-y-2">
+                            <h4 class="font-bold text-brand-700">Perspektif Human Capital Modern</h4>
+                            <p>Pendidikan adalah bentuk investasi modal manusia (<em>Human Capital Investment</em>). Guru adalah manusia yang membutuhkan kesejahteraan hidup. <strong>Pendidikan tidak dapat berjalan hanya bermodalkan senyum</strong>; kesejahteraan pendidik adalah syarat mutlak kualitas pendidikan Islam modern.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 6: WORKSTATION LKM PBL INTERAKTIF ================= -->
+        <section id="section-lkm-pbl" class="tab-content hidden space-y-6">
+            <div class="bg-brand-50 border border-brand-200 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="bg-brand-500 text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-wider">Modul Problem-Based Learning</span>
+                    <h2 class="text-2xl font-bold text-brand-700 mt-1">Lembar Kerja Mahasiswa (LKM) Digital</h2>
+                    <p class="text-xs md:text-sm text-gray-600">Mata Kuliah: Ilmu Pendidikan Islam | Topik: Asas Pendidikan & Ekonomi Guru</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportLKMData()" class="bg-brand-gold hover:bg-yellow-600 text-brand-700 font-bold px-4 py-2 rounded-xl text-xs shadow transition flex items-center gap-1">💾 Simpan Progress</button>
+                    <button onclick="resetLKMForm()" class="bg-white text-gray-600 border border-gray-300 hover:bg-gray-100 font-semibold px-4 py-2 rounded-xl text-xs transition">🔄 Reset Form</button>
+                </div>
+            </div>
+
+            <!-- PBL Progress Stepper -->
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs font-semibold">
+                <button onclick="setPBLStep(1)" id="step-btn-1" class="pbl-step-btn p-3 rounded-xl border bg-brand-500 text-white border-brand-500 shadow-sm">Tahap 1: Orientasi Masalah</button>
+                <button onclick="setPBLStep(2)" id="step-btn-2" class="pbl-step-btn p-3 rounded-xl border bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Tahap 2: Organisasi Belajar</button>
+                <button onclick="setPBLStep(3)" id="step-btn-3" class="pbl-step-btn p-3 rounded-xl border bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Tahap 3: Penyelidikan</button>
+                <button onclick="setPBLStep(4)" id="step-btn-4" class="pbl-step-btn p-3 rounded-xl border bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Tahap 4: Action Plan</button>
+                <button onclick="setPBLStep(5)" id="step-btn-5" class="pbl-step-btn p-3 rounded-xl border bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Tahap 5: Evaluasi & Rubrik</button>
+            </div>
+
+            <!-- PBL STEP CONTENT PANELS -->
+
+            <!-- STEP 1: ORIENTASI MASALAH -->
+            <div id="pbl-panel-1" class="pbl-panel bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                <div class="border-b border-gray-100 pb-4">
+                    <span class="text-xs font-bold text-brand-500 uppercase">Tahap 1</span>
+                    <h3 class="text-xl font-bold text-gray-900">📖 Studi Kasus Kontekstual: Krisis Yayasan "Al-Falah"</h3>
+                </div>
+
+                <div class="bg-amber-50/60 p-5 rounded-xl border border-amber-200/80 leading-relaxed text-xs md:text-sm text-gray-800 space-y-3">
+                    <p class="font-semibold text-amber-900">Krisis Kesejahteraan dan Profesionalisme Guru di Yayasan Pendidikan "Al-Falah"</p>
+                    <p>Yayasan Pendidikan "Al-Falah" mengelola sekolah Islam terpadu di daerah semi-urban. Dalam 3 tahun terakhir, mutu lulusan mengalami penurunan signifikan. Berdasarkan survei internal:</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-gray-700">
+                        <li>Mayoritas guru mengajar menggunakan metode monoton (ceramah tanpa alat peraga) dan tidak memperhatikan perbedaan minat/bakat peserta didik.</li>
+                        <li>Para guru dipaksa untuk <em>"ikhlas murni"</em> tanpa honorarium layak (di bawah UMR). Sebagian besar guru harus bekerja sampingan sebagai pengemudi ojek online atau pedagang malam hari.</li>
+                        <li>Pengurus yayasan mengutip pandangan klasik bahwa <em>"meminta gaji menghilangkan keberkahan ilmu"</em> dan guru zaman dahulu mengajar sukarela.</li>
+                        <li>Dampaknya, interaksi kasih sayang, pembiasaan akhlak, dan teladan (<em>walk the talk</em>) berkurang drastis karena guru kelelahan dan stress.</li>
+                    </ol>
+                </div>
+
+                <div class="flex justify-end">
+                    <button onclick="setPBLStep(2)" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow">Lanjut ke Tahap 2: Organisasi Kelompok ➔</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: ORGANISASI BELAJAR -->
+            <div id="pbl-panel-2" class="pbl-panel hidden bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                <div class="border-b border-gray-100 pb-4">
+                    <span class="text-xs font-bold text-brand-500 uppercase">Tahap 2</span>
+                    <h3 class="text-xl font-bold text-gray-900">👥 Mengorganisasi Mahasiswa untuk Belajar</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nama Kelompok / Ketua</label>
+                        <input type="text" id="input-kelompok" placeholder="Misal: Kelompok 1 - Insan Kamil" class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Anggota Kelompok</label>
+                        <input type="text" id="input-anggota" placeholder="Ahmad, Siti, Budi, Rahma" class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">1. Identifikasi 3 Masalah Utama berdasarkan Asas-Asas Pendidikan Islam</label>
+                        <textarea id="ans-problem-ident" rows="3" placeholder="Tuliskan 3 masalah utama..." class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">2. Kritik Konseptual: Pertentangan Keikhlasan Guru vs Kesejahteraan Ekonomi Modern</label>
+                        <textarea id="ans-problem-critique" rows="3" placeholder="Bagaimana tanggapan kritis kelompok Anda?" class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="setPBLStep(1)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition">← Kembali</button>
+                    <button onclick="setPBLStep(3)" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow">Lanjut ke Tahap 3: Penyelidikan Dalil ➔</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: PENYELIDIKAN MANDIRI -->
+            <div id="pbl-panel-3" class="pbl-panel hidden bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                <div class="border-b border-gray-100 pb-4">
+                    <span class="text-xs font-bold text-brand-500 uppercase">Tahap 3</span>
+                    <h3 class="text-xl font-bold text-gray-900">🔍 Membimbing Penyelidikan Mandiri & Kelompok</h3>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Sub-part A -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-gray-200 space-y-3">
+                        <h4 class="font-bold text-sm text-brand-700">A. Analisis Asas Pendidik Imam Al-Ghazali & Dalil Agama</h4>
+                        <p class="text-xs text-gray-600">Mengapa guru di Yayasan Al-Falah sulit menerapkan 8 kewajiban pendidik (seperti kasih sayang, nasihat, dan teladan)? Korelasikan dengan <strong>QS. Al-Baqarah: 44</strong> atau <strong>QS. Ash-Shaff: 2-3</strong>!</p>
+                        <textarea id="ans-invest-ghazali" rows="4" placeholder="Tuliskan hasil analisis dalil dan kewajiban pendidik Al-Ghazali di sini..." class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+
+                    <!-- Sub-part B -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-gray-200 space-y-3">
+                        <h4 class="font-bold text-sm text-brand-700">B. Analisis Asas Ekonomi & Human Capital Theory</h4>
+                        <p class="text-xs text-gray-600">Mengapa pandangan yayasan yang menolak gaji layak bertentangan dengan Asas Ekonomi Pendidikan Islam modern? Cantumkan argumentasi ilmiah dan Hadis pendukung!</p>
+                        <textarea id="ans-invest-economy" rows="4" placeholder="Tuliskan hasil analisis asas ekonomi dan modal manusia di sini..." class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="setPBLStep(2)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition">← Kembali</button>
+                    <button onclick="setPBLStep(4)" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow">Lanjut ke Tahap 4: Action Plan ➔</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: ACTION PLAN TABLE BUILDER -->
+            <div id="pbl-panel-4" class="pbl-panel hidden bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                <div class="border-b border-gray-100 pb-4 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <span class="text-xs font-bold text-brand-500 uppercase">Tahap 4</span>
+                        <h3 class="text-xl font-bold text-gray-900">🛠️ Rencana Aksi Reformasi Sekolah (Action Plan)</h3>
+                    </div>
+                    <button onclick="addActionButton()" class="bg-brand-gold hover:bg-yellow-600 text-brand-700 font-bold px-3 py-1.5 rounded-lg text-xs transition">+ Tambah Baris Solusi</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-brand-50 text-brand-700 border-b border-brand-200">
+                                <th class="p-3">Asas Pendidikan Islam</th>
+                                <th class="p-3">Tindakan Solutif & Inovasi Kelompok</th>
+                                <th class="p-3">Indikator Keberhasilan</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="action-plan-tbody" class="divide-y divide-gray-200">
+                            <!-- Dynamic Rows Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex justify-between">
+                    <button onclick="setPBLStep(3)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition">← Kembali</button>
+                    <button onclick="setPBLStep(5)" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow">Lanjut ke Tahap 5: Evaluasi & Rubrik ➔</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: EVALUASI & RUBRIK PENILAIAN -->
+            <div id="pbl-panel-5" class="pbl-panel hidden bg-white p-6 md:p-8 rounded-2xl border border-gray-100 shadow-sm space-y-6">
+                <div class="border-b border-gray-100 pb-4">
+                    <span class="text-xs font-bold text-brand-500 uppercase">Tahap 5</span>
+                    <h3 class="text-xl font-bold text-gray-900">📝 Analisis, Evaluasi & Rubrik Penilaian Dosen</h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">1. Kesimpulan Utama: Hubungan Asas Ekonomi & Keberhasilan Metodologi Pembelajaran</label>
+                        <textarea id="ans-eval-conclusion" rows="3" placeholder="Tuliskan kesimpulan reflektif..." class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">2. Komitmen Calon Pendidik: Penerapan Idealis & Pragmatis-Profesional di Masa Depan</label>
+                        <textarea id="ans-eval-future" rows="3" placeholder="Bagaimana rencana komitmen pribadi Anda?" class="w-full text-xs p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none custom-scrollbar"></textarea>
+                    </div>
+                </div>
+
+                <!-- Interactive Scoring Rubric Tool for Lecturers -->
+                <div class="bg-slate-50 p-6 rounded-xl border border-gray-200 space-y-4">
+                    <h4 class="font-bold text-base text-gray-900 flex items-center justify-between">
+                        <span>📊 Rubrik Penilaian LKM (Simulasi Mandiri / Evaluasi Dosen)</span>
+                        <span id="rubric-total-score" class="bg-brand-500 text-white text-xs px-3 py-1 rounded-full">Total Skor: 0 / 100</span>
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2">
+                            <div class="flex justify-between font-bold">
+                                <span>1. Analisis Masalah & Dalil</span>
+                                <span class="text-brand-500">Maks: 30</span>
+                            </div>
+                            <input type="range" min="0" max="30" value="0" id="rubric-score-1" oninput="updateRubricScore()" class="w-full accent-brand-500">
+                            <p class="text-gray-500">Kajilah Ketajaman identifikasi masalah dan korelasi ayat/hadis.</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2">
+                            <div class="flex justify-between font-bold">
+                                <span>2. Penyelidikan & Argumentasi</span>
+                                <span class="text-brand-500">Maks: 25</span>
+                            </div>
+                            <input type="range" min="0" max="25" value="0" id="rubric-score-2" oninput="updateRubricScore()" class="w-full accent-brand-500">
+                            <p class="text-gray-500">Keseimbangan antara spiritual (ikhlas) dan ekonomi profesional.</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2">
+                            <div class="flex justify-between font-bold">
+                                <span>3. Solusi & Action Plan</span>
+                                <span class="text-brand-500">Maks: 30</span>
+                            </div>
+                            <input type="range" min="0" max="30" value="0" id="rubric-score-3" oninput="updateRubricScore()" class="w-full accent-brand-500">
+                            <p class="text-gray-500">Solusi konkret, inovatif, dan indikator keterukuran jelas.</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg border border-gray-200 space-y-2">
+                            <div class="flex justify-between font-bold">
+                                <span>4. Kerjasama & Presentasi</span>
+                                <span class="text-brand-500">Maks: 15</span>
+                            </div>
+                            <input type="range" min="0" max="15" value="0" id="rubric-score-4" oninput="updateRubricScore()" class="w-full accent-brand-500">
+                            <p class="text-gray-500">Kejelasan struktur laporan dan kolaborasi kelompok.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                    <button onclick="setPBLStep(4)" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-5 py-2.5 rounded-xl text-sm transition">← Kembali</button>
+                    <button onclick="window.print()" class="bg-brand-700 hover:bg-brand-600 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition shadow flex items-center gap-2">🖨️ Cetak / Simpan Laporan LKM (PDF)</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-center text-xs text-gray-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 Interactive Module: Asas-Asas Pendidikan Islam | Disusun berdasarkan Modul Perkuliahan & PBL</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA SOURCES
+        const dataAsas9 = [
+            {
+                id: 1,
+                title: "Asas Pendidikan Seumur Hidup",
+                english: "Lifelong Learning",
+                category: "belajar",
+                dalilQuran: "QS. Az-Zumar [39]: 9",
+                ayatQuran: "قُلْ هَلْ يَسْتَوِي الَّذِينَ يَعْلَمُونَ وَالَّذِينَ لَا يَعْلَمُونَ ۗ إِنَّمَا يَتَذَكَّرُ أُولُو الْأَلْبَابِ",
+                artiQuran: "Katakanlah: 'Apakah sama orang-orang yang mengetahui dengan orang-orang yang tidak mengetahui?' Sesungguhnya orang yang berakallah yang dapat menerima pelajaran.",
+                dalilHadis: "طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ",
+                artiHadis: "Mencari ilmu itu wajib bagi setiap muslim. (HR. Ibnu Majah no. 224, shahih).",
+                contoh: "Seorang kakek usia 60 tahun yang tetap aktif mengikuti pelatihan digital atau majelis ilmu tanpa merasa terlambat."
+            },
+            {
+                id: 2,
+                title: "Asas Tidak Ada Batasan Belajar",
+                english: "Limitless Learning",
+                category: "belajar",
+                dalilQuran: "QS. Al-Isra [17]: 85",
+                ayatQuran: "وَمَا أُوتِيتُمْ مِنَ الْعِلْمِ إِلَّا قَلِيلًا",
+                artiQuran: "Dan tidaklah kamu diberi pengetahuan melainkan sedikit.",
+                dalilHadis: "Mencari ilmu dari buaian hingga liang lahad.",
+                artiHadis: "Menekankan bahwa ilmu Allah tidak terbatas oleh usia, batas geografis, maupun derajat sosial.",
+                contoh: "Mahasiswa yang terus membaca literatur lintas disiplin meskipun telah meraih gelar doktor."
+            },
+            {
+                id: 3,
+                title: "Asas Perbedaan Metode & Pendekatan",
+                english: "Differentiated Instruction",
+                category: "belajar",
+                dalilHadis: "Kalam ala qadri 'uqulihim",
+                artiHadis: "Bicaralah kepada manusia sesuai dengan kadar kemampuan akal mereka. (HR. Ad-Dailami).",
+                contoh: "Guru tidak menyamakan metode ceramah untuk murid auditori dengan visual, melainkan bervariasi."
+            },
+            {
+                id: 4,
+                title: "Asas Spesialisasi & Profesionalisme",
+                english: "Expertise & Mastery",
+                category: "belajar",
+                dalilHadis: "Jika urusan diserahkan bukan pada ahlinya...",
+                artiHadis: "Tunggulah kehancurannya. (HR. Bukhari).",
+                contoh: "Pendidikan memfasilitasi anak didik untuk mendalami bidang keahlian spesifik seperti kedokteran, fiqh, atau teknik."
+            },
+            {
+                id: 5,
+                title: "Asas Penggunaan Alat Peraga",
+                english: "Visual & Audio Aids",
+                category: "belajar",
+                dalilHadis: "Metode Garis Nabi SAW di atas tanah",
+                artiHadis: "Nabi SAW membuat garis lurus dan garis bercabang di tanah untuk menjelaskan Sirathal Mustaqim.",
+                contoh: "Dosen mengajar peradaban Islam dengan maket 3D, peta interaktif, atau Canva/Quizizz."
+            },
+            {
+                id: 6,
+                title: "Asas Memperhatikan Bakat & Minat",
+                english: "Student-Centered Interest",
+                category: "fitrah",
+                dalilHadis: "Kul lu mauludin yuladu 'alal fitrah...",
+                artiHadis: "Setiap anak lahir di atas fitrah. Orang tuanya yang menjadikan Yahudi, Nasrani, atau Majusi. (HR. Bukhari & Muslim).",
+                contoh: "Anak berpotensi di bidang seni tidak dipaksa masuk olimpiade matematika, melainkan dikembangkan bakat seninya secara islami."
+            },
+            {
+                id: 7,
+                title: "Asas Memulai dengan Ilmu Bantu",
+                english: "Prerequisite Knowledge",
+                category: "belajar",
+                dalilHadis: "Kaidah Gradasi Keilmuan",
+                artiHadis: "Ilmu tata bahasa (Nahwu/Saraf) dan logika sebagai sarana memahami wahyu.",
+                contoh: "Sebelum belajar Tafsir Al-Qur'an tingkat lanjut, murid diajarkan bahasa Arab dasar terlebih dahulu."
+            },
+            {
+                id: 8,
+                title: "Asas Perhatian Pembawaan & Instinct",
+                english: "Nurturing Fitrah",
+                category: "fitrah",
+                dalilHadis: "Penyaluran Dorongan Alamiah",
+                artiHadis: "Mengarahkan dorongan naluri manusia (rasa ingin tahu, kepemimpinan) pada kebaikan.",
+                contoh: "Naluri berkompetisi anak disalurkan melalui lomba kebaikan (Fastabiqul Khairat), bukan permusuhan."
+            },
+            {
+                id: 9,
+                title: "Asas Rekreatif / Kreativitas Pengelola",
+                english: "Creative & Enjoyable Learning",
+                category: "belajar",
+                dalilHadis: "Yassiruu walaa tu'assiruu",
+                artiHadis: "Permudahlah dan jangan kamu persulit, berilah kabar gembira dan jangan buat mereka lari. (HR. Bukhari).",
+                contoh: "Pengelola sekolah merancang suasana belajar yang menyegarkan, outdoor study, dan lingkungan ramah anak."
+            }
+        ];
+
+        const dataGhazali = [
+            {
+                id: 1,
+                title: "1. Kasih Sayang Seperti Anak Sendiri",
+                hadis: "Sesungguhnya kedudukanku bagi kalian adalah seperti seorang ayah kepada anaknya, aku mengajari kalian. (HR. Abu Dawud & An-Nasa'i).",
+                skenario: "Guru menyapa siswa yang murung dengan empati mendalam, mendengar masalahnya seperti orang tua sendiri."
+            },
+            {
+                id: 2,
+                title: "2. Niat Ikhlas Tanpa Mengharap Balas Jasa",
+                hadis: "Mengajar demi mencari ridha Allah SWT semata.",
+                skenario: "Secara spiritual niat mengajar murni dedikasi, meskipun lembaga tetap secara profesional menjamin kesejahteraan ekonominya."
+            },
+            {
+                id: 3,
+                title: "3. Selalu Memberi Nasihat & Arahan",
+                hadis: "Agama adalah nasihat. (HR. Muslim).",
+                skenario: "Memanfaatkan setiap sela pembelajaran untuk menyelipkan pesan moral dan bimbingan karakter."
+            },
+            {
+                id: 4,
+                title: "4. Mencegah Akhlak Buruk dengan Sindiran Halus",
+                hadis: "Pendekatan persuasif dan menjaga kehormatan murid.",
+                skenario: "Tidak mempermalukan siswa yang salah di depan umum, melainkan mengarahkan secara pribadi dengan bahasa lembut."
+            },
+            {
+                id: 5,
+                title: "5. Berbicara Sesuai Kadar Akal Murid",
+                hadis: "Bicaralah kepada manusia sesuai dengan kadar kemampuan akal mereka. (HR. Ad-Dailami).",
+                skenario: "Menggunakan analogi sederhana saat mengajar anak usia dasar, bukan istilah filsafat tingkat tinggi."
+            },
+            {
+                id: 6,
+                title: "6. Menghargai Cabang Ilmu Lain",
+                hadis: "Hikmah adalah barang hilang milik orang mukmin.",
+                skenario: "Guru agama tidak merendahkan ilmu sains modern, melainkan menunjukkan integrasi ilmu."
+            },
+            {
+                id: 7,
+                title: "7. Mengajar Bertahap Sesuai Usia",
+                hadis: "Pembelajaran bertahap dari konkret ke abstrak.",
+                skenario: "Memberikan materi dasar yang jelas sebelum membuka rahasia/konsep yang lebih kompleks."
+            },
+            {
+                id: 8,
+                title: "8. Integritas (Walk the Talk)",
+                dalil: "QS. Al-Baqarah: 44 & QS. Ash-Shaff: 2-3 ('Kabura maqtan 'indallahi an taquuluu maa laa taf'aluun')",
+                skenario: "Guru disiplin tepat waktu dan berakhlak mulia sesuai dengan apa yang ia ajarkan di kelas."
+            }
+        ];
+
+        const dataUmumUmum = {
+            historis: { title: "Asas Historis (Sejarah)", desc: "Mempersiapkan pendidik dengan hasil pengalaman masa lalu, undang-undang, kelebihan, serta batasan sejarah untuk membangun strategi baru." },
+            sosiologi: { title: "Asas Sosiologis (Masyarakat)", desc: "Memberikan kerangka budaya tempat pendidikan bertolak untuk memindahkan, menyaring, dan mengembangkan kebudayaan masyarakat." },
+            ekonomi: { title: "Asas Ekonomi (Finansial)", desc: "Perspektif potensi finansial, anggaran, dan investasi modal manusia (Human Capital Theory) yang menjamin kelangsungan mutu." },
+            politik: { title: "Asas Politik & Administrasi", desc: "Bingkai ideologi (aqidah Islam) dan kepemimpinan yang mengarahkan kebijakan pendidikan menuju cita-cita bersama." },
+            psikologis: { title: "Asas Psikologis (Jiwa)", desc: "Informasi mengenai watak peserta didik dan guru, metode pencapaian belajar, bimbingan, serta pengukuran dan penilaian." }
+        };
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAsas9Cards(dataAsas9);
+            renderGhazaliList();
+            initRadarChart();
+            initActionPlanTable();
+        });
+
+        // TAB SWITCHER
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                el.classList.remove('bg-brand-500', 'text-white');
+                el.classList.add('text-gray-600');
+            });
+
+            const activeTab = document.getElementById(`section-${tabId}`);
+            if (activeTab) activeTab.classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-brand-500', 'text-white');
+                activeNav.classList.remove('text-gray-600');
+            }
+        }
+
+        // 9 ASAS RENDER & FILTER
+        function renderAsas9Cards(items) {
+            const container = document.getElementById('asas-cards-container');
+            container.innerHTML = items.map(item => `
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="bg-brand-50 text-brand-600 font-bold text-xs px-2.5 py-1 rounded-md">Asas #${item.id}</span>
+                            <span class="text-xs text-gray-400 italic">${item.english}</span>
+                        </div>
+                        <h3 class="font-bold text-base text-gray-900 mb-2">${item.title}</h3>
+                        ${item.ayatQuran ? `
+                            <div class="bg-amber-50/50 p-3 rounded-xl border border-amber-100 mb-3 space-y-1">
+                                <p class="text-xs font-bold text-amber-800">${item.dalilQuran}</p>
+                                <p class="arabic-text text-right text-base text-amber-900">${item.ayatQuran}</p>
+                                <p class="text-xs text-gray-600 italic">"${item.artiQuran}"</p>
+                            </div>
+                        ` : ''}
+                        ${item.dalilHadis ? `
+                            <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 mb-3 space-y-1">
+                                <p class="text-xs font-bold text-emerald-800">Dalil Hadis / Kaidah:</p>
+                                <p class="text-xs text-emerald-900 font-medium">${item.dalilHadis}</p>
+                                <p class="text-xs text-gray-600 italic">"${item.artiHadis}"</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="pt-3 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-700 mb-1">💡 Contoh Kehidupan Sehari-Hari:</p>
+                        <p class="text-xs text-gray-600 leading-relaxed">${item.contoh}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterAsas(category) {
+            document.querySelectorAll('.filter-asas-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-500', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-600');
+            });
+            event.target.classList.add('bg-brand-500', 'text-white');
+            event.target.classList.remove('bg-white', 'text-gray-600');
+
+            if (category === 'all') {
+                renderAsas9Cards(dataAsas9);
+            } else {
+                renderAsas9Cards(dataAsas9.filter(x => x.category === category));
+            }
+        }
+
+        // 6 ASAS UMUM DETAIL DISPLAY
+        function showUmumDetail(key) {
+            const data = dataUmumUmum[key];
+            if (data) {
+                document.getElementById('umum-title').innerText = data.title;
+                document.getElementById('umum-desc').innerText = data.desc;
+            }
+        }
+
+        // GHAZALI EXPANDER
+        function renderGhazaliList() {
+            const listContainer = document.getElementById('ghazali-list');
+            listContainer.innerHTML = dataGhazali.map((item, index) => `
+                <button onclick="selectGhazali(${index})" class="ghazali-btn w-full text-left p-3.5 rounded-xl border border-gray-200 hover:border-brand-500 bg-white hover:bg-brand-50 transition text-xs font-semibold text-gray-800 flex justify-between items-center ${index === 0 ? 'border-brand-500 bg-brand-50' : ''}">
+                    <span>${item.title}</span>
+                    <span>➔</span>
+                </button>
+            `).join('');
+            selectGhazali(0);
+        }
+
+        function selectGhazali(index) {
+            const item = dataGhazali[index];
+            const display = document.getElementById('ghazali-display');
+            display.innerHTML = `
+                <div class="space-y-4">
+                    <span class="bg-brand-goldlight text-brand-gold font-bold text-xs px-3 py-1 rounded-full border border-brand-gold/30">Prinsip Imam Al-Ghazali #${item.id}</span>
+                    <h3 class="text-xl font-bold text-brand-700">${item.title}</h3>
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                        <h4 class="font-bold text-xs text-emerald-800">📖 Dalil Agama / Landasan Teks:</h4>
+                        <p class="text-xs md:text-sm text-emerald-900 italic leading-relaxed">"${item.hadis || item.dalil}"</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-gray-200 space-y-2">
+                        <h4 class="font-bold text-xs text-gray-800">🏫 Skenario Praktis Pengajaran:</h4>
+                        <p class="text-xs md:text-sm text-gray-700 leading-relaxed">${item.skenario}</p>
+                    </div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-gray-100 text-xs text-gray-400 italic">
+                    Sumber: Kitab Ihya Ulumuddin & Dasar-Dasar Pokok Pendidikan Islam (M. Athiyah Al-Abrasyi).
+                </div>
+            `;
+        }
+
+        // RADAR CHART (CHART.JS)
+        function initRadarChart() {
+            const ctx = document.getElementById('asasRadarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Filsafat (Kompas)', 'Historis (Sejarah)', 'Sosiologis (Budaya)', 'Ekonomi (Modal)', 'Politik (Ideologi)', 'Psikologis (Jiwa)'],
+                    datasets: [{
+                        label: 'Keseimbangan Bobot Asas Umum',
+                        data: [100, 80, 85, 90, 85, 95],
+                        backgroundColor: 'rgba(30, 107, 82, 0.2)',
+                        borderColor: '#1e6b52',
+                        pointBackgroundColor: '#c59b27',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#f3f4f6' },
+                            pointLabels: {
+                                font: { size: 10, family: 'Plus Jakarta Sans' },
+                                color: '#374151'
+                            },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // PBL STEPPER
+        function setPBLStep(stepNum) {
+            document.querySelectorAll('.pbl-panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.pbl-step-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-500', 'text-white', 'border-brand-500');
+                btn.classList.add('bg-white', 'text-gray-600', 'border-gray-200');
+            });
+
+            document.getElementById(`pbl-panel-${stepNum}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`step-btn-${stepNum}`);
+            activeBtn.classList.add('bg-brand-500', 'text-white', 'border-brand-500');
+            activeBtn.classList.remove('bg-white', 'text-gray-600');
+        }
+
+        // ACTION PLAN TABLE DYNAMICS
+        let actionPlanRows = [
+            { asas: "Asas Alat Peraga & Metode", solusi: "Mengadakan pelatihan Canva & Quizizz untuk guru", indikator: "100% guru mampu menggunakan media interaktif" },
+            { asas: "Asas Ekonomi & Kesejahteraan", solusi: "Restrukturisasi anggaran sekolah untuk standar gaji UMR", indikator: "Guru tidak perlu mencari sampingan malam hari" }
+        ];
+
+        function initActionPlanTable() {
+            renderActionPlanTable();
+        }
+
+        function renderActionPlanTable() {
+            const tbody = document.getElementById('action-plan-tbody');
+            tbody.innerHTML = actionPlanRows.map((row, idx) => `
+                <tr>
+                    <td class="p-2.5"><input type="text" value="${row.asas}" onchange="updateActionRow(${idx}, 'asas', this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs"></td>
+                    <td class="p-2.5"><input type="text" value="${row.solusi}" onchange="updateActionRow(${idx}, 'solusi', this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs"></td>
+                    <td class="p-2.5"><input type="text" value="${row.indikator}" onchange="updateActionRow(${idx}, 'indikator', this.value)" class="w-full p-2 border border-gray-300 rounded-lg text-xs"></td>
+                    <td class="p-2.5 text-center"><button onclick="deleteActionRow(${idx})" class="text-red-500 hover:text-red-700 font-bold">✕</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function addActionButton() {
+            actionPlanRows.push({ asas: "Asas ...", solusi: "Solusi baru...", indikator: "Indikator..." });
+            renderActionPlanTable();
+        }
+
+        function deleteActionRow(idx) {
+            actionPlanRows.splice(idx, 1);
+            renderActionPlanTable();
+        }
+
+        function updateActionRow(idx, field, val) {
+            actionPlanRows[idx][field] = val;
+        }
+
+        // RUBRIC SCORING CALCULATOR
+        function updateRubricScore() {
+            const s1 = parseInt(document.getElementById('rubric-score-1').value) || 0;
+            const s2 = parseInt(document.getElementById('rubric-score-2').value) || 0;
+            const s3 = parseInt(document.getElementById('rubric-score-3').value) || 0;
+            const s4 = parseInt(document.getElementById('rubric-score-4').value) || 0;
+            const total = s1 + s2 + s3 + s4;
+            document.getElementById('rubric-total-score').innerText = `Total Skor: ${total} / 100`;
+        }
+
+        // SAVE & RESET FORM
+        function exportLKMData() {
+            const data = {
+                kelompok: document.getElementById('input-kelompok').value,
+                anggota: document.getElementById('input-anggota').value,
+                problemIdent: document.getElementById('ans-problem-ident').value,
+                critique: document.getElementById('ans-problem-critique').value,
+                ghazaliInvest: document.getElementById('ans-invest-ghazali').value,
+                economyInvest: document.getElementById('ans-invest-economy').value,
+                actionPlan: actionPlanRows,
+                conclusion: document.getElementById('ans-eval-conclusion').value,
+                futureCommitment: document.getElementById('ans-eval-future').value
+            };
+            localStorage.setItem('pbl_lkm_saved_data', JSON.stringify(data));
+            alert(' Progress LKM berhasil disimpan di browser Anda!');
+        }
+
+        function resetLKMForm() {
+            if (confirm('Apakah Anda yakin ingin mengosongkan form LKM ini?')) {
+                localStorage.removeItem('pbl_lkm_saved_data');
+                location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
